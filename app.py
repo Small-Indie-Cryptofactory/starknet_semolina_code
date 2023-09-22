@@ -14,11 +14,11 @@ from data.models import Wallet, Settings
 
 
 async def start_deploy_wallets():
-    text = f'Enter the path to the file with wallets (address, private key, seed phrase):\n'
+    text = f'Enter the path to the file with wallets ( address, private_key, seed_phrase[OPTIONAL] ):\n'
     wallets_files = find_wallets_files()
     if wallets_files:
         for number, wallets_file in enumerate(wallets_files, start=1):
-            text += f'Press "{number}" if you want to use {wallets_file}:\n'
+            text += f'Press "{number}" if you want to use {"/".join(wallets_file.split("/")[-2:])}\n'
         text += '> '
     else:
         text += '> '

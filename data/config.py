@@ -14,6 +14,7 @@ ETH_RPC = 'https://rpc.ankr.com/eth'
 FILES_DIR = os.path.join(ROOT_DIR, 'files')
 DEBUG_PATH = os.path.join(FILES_DIR, 'debug.log')
 PROXY_PATH = os.path.join(FILES_DIR, 'proxy.txt')
+PRIVATE_KEYS_PATH = os.path.join(FILES_DIR, 'private_keys.csv')
 SETTINGS_PATH = os.path.join(FILES_DIR, 'settings.json')
 
 ABIS_DIR = os.path.join(ROOT_DIR, 'abis')
