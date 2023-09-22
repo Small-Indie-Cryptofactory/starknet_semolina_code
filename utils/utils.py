@@ -1,10 +1,24 @@
-import random
-from typing import Optional, Union
-from decimal import Decimal
 import time
+import random
+from decimal import Decimal
+from typing import Optional, Union
 from datetime import datetime, timedelta, timezone
 
+import asyncio
+from loguru import logger
 from fake_useragent import UserAgent
+from tqdm import tqdm
+from data.models import Settings
+
+
+def check_node_url(proxies_lst: list):
+    settings = Settings()
+    if settings.node_url in ['', 'https://starknet-mainnet.public.blastapi.io'] and not proxies_lst:
+        logger.warning('\nWe recommend adding the Alchemy/Blast RPC provider to the node_url settings.\n'
+                       'Currently, you are not using a proxy and are using a public RPC.\n'
+                       'Press Enter if you are sure and want to continue the action.\n'
+                       'Press CTRL + C to close program.')
+        input()
 
 
 def randfloat(from_: Union[int, float, str], to_: Union[int, float, str],
@@ -92,3 +106,23 @@ def get_request_headers() -> dict:
     }
 
     return headers
+
+
+async def sleep_delay():
+    settings = Settings()
+    sleep_time = random.randint(
+        settings.sleep_time.from_, settings.sleep_time.to_
+    )
+    next_action_time = int(time.time()) + int(sleep_time)
+    logger.debug(f'I will sleep {sleep_time} second(s). The next closest action will '
+                 f'be performed at {unix_to_strtime(next_action_time)}')
+    for _ in tqdm(range(sleep_time), desc='Sleeping: ', unit='SEC', colour='GREEN'):
+        await asyncio.sleep(1)
+
+
+def get_lines(path):
+    proxies_lst = []
+    if path:
+        with open(path, encoding='utf-8') as f:
+            proxies_lst = list(map(lambda line: line.strip(), filter(lambda line: line.strip(), f.readlines())))
+    return proxies_lst

@@ -1,11 +1,10 @@
-from generate_wallets.seed_phrase_helper.crypto import HDPrivateKey, HDKey
-from generate_wallets.utils import grid_key, wallet_to_hex, eip2645_hashing, get_wallet_info
-
 from starknet_py.net.signer.stark_curve_signer import KeyPair
 from starknet_py.hash.address import compute_address
 
 from client import EthClient
 from data.models import Networks
+from generate_wallets.seed_phrase_helper.crypto import HDPrivateKey, HDKey
+from generate_wallets.utils import grid_key, wallet_to_hex, eip2645_hashing, get_wallet_info
 
 
 class Wallet:

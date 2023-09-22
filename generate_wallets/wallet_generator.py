@@ -1,10 +1,10 @@
 import csv
 import os
-from datetime import datetime
-from generate_wallets.wallet import Wallet
 from tqdm import tqdm
+from datetime import datetime
 
 from data.config import FILES_DIR
+from generate_wallets.wallet import Wallet
 
 
 class WalletGenerator:
@@ -22,12 +22,12 @@ def wallet_create():
         wallets_count = input('How many wallets to generate: ')
     wallets_count = int(wallets_count)
 
-    if wallets_count <= 0:
-        raise ValueError('Number of wallets to generate should be greater than zero.')
-    provider = input('What wallet you want create (argent/braavos/ethereum): ').lower()
-    if provider not in ['argent', 'braavos', 'ethereum']:
-        raise ValueError('Only argent/braavos/ethereum are allowed.')
-    for _ in tqdm(range(wallets_count)):
+    provider = input('What wallet you want create (argent/braavos/ethereum): ').lower().strip()
+    while provider not in ['argent', 'braavos', 'ethereum']:
+        print('Only the wallets argent, braavos, and ethereum are available for generation. Please try again...')
+        provider = input('What wallet you want create (argent/braavos/ethereum): ').lower().strip()
+
+    for _ in tqdm(range(wallets_count), desc='Creating wallets: ', unit=' wallets', colour='GREEN'):
         wallet = WalletGenerator.generate_wallet(provider)
         wallets_rows.append([wallet.address, wallet.private_key, wallet.seed_phrase])
 

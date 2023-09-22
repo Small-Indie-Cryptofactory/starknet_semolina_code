@@ -1,6 +1,10 @@
 import hashlib
+import os
+from typing import Optional
 from starknet_py.hash.selector import get_selector_from_name
+
 from data.models import Implementations
+from data.config import FILES_DIR
 
 
 def get_wallet_info(wallet, key_pair):
@@ -13,7 +17,7 @@ def get_wallet_info(wallet, key_pair):
     elif wallet == 'braavos':
         implementation_class_hash = int('0x5aa23d5bb71ddaa783da7ea79d405315bafa7cf0387a74f4593578c3e9e6570', 16)
         proxy_class_hash = int('0x03131fa018d520a037686ce3efddeab8f28895662f019ca3ca18a626650f7d1e', 16)
-        selector = int('0x02dd76e7ad84dbed81c314ffe5e7a7cacfb8f4836f01af4e913f275f89a3de1a', 16)
+        selector = get_selector_from_name('initializer')
         calldata = [key_pair.public_key]
         return implementation_class_hash, proxy_class_hash, selector, calldata
     return None
@@ -80,14 +84,14 @@ def get_payload_hash(payload):
     for value in payload:
         hex_value = hex(value)[2::]
         if len(hex_value) == 1:
-            hex_value = "0"+ hex_value
+            hex_value = "0" + hex_value
         m.update(bytes.fromhex(hex_value))
-    
+
     return m.hexdigest()
 
 
 def eip2645_hashing(key0):
-    N = 2**256
+    N = 2 ** 256
     STARK_CURVE_ORDER = 0x800000000000010FFFFFFFFFFFFFFFFB781126DCAE7B2321E66A241ADC64D2F
     N_MINUS_N = N - (N % STARK_CURVE_ORDER)
 
@@ -99,3 +103,31 @@ def eip2645_hashing(key0):
         if key < N_MINUS_N:
             return hex(key % STARK_CURVE_ORDER)
         i += 1
+
+
+def find_proxy_file(files_dir: str = FILES_DIR) -> Optional[str]:
+    files = os.listdir(files_dir)
+    files = list(filter(lambda file: file.startswith('proxy') and file.split('.')[-1] == 'txt', files))
+    file_name_ctime_dict = {}
+    for file in files:
+        absolute_path = os.path.join(files_dir, file)
+        file_name_ctime_dict[absolute_path] = os.path.getctime(absolute_path)
+    sorted_dict = dict(sorted(file_name_ctime_dict.items(), key=lambda item: item[1]))
+    if sorted_dict:
+        return list(sorted_dict.keys())[0]
+
+
+def find_wallets_files(files_dir: str = FILES_DIR) -> Optional[list[str]]:
+    files = os.listdir(files_dir)
+    files = list(filter(
+        lambda file: (file.startswith('argent') or file.startswith('braavos') or file.startswith('private')) \
+                     and file.split('.')[-1] == 'csv',
+        files)
+    )
+    file_name_ctime_dict = {}
+    for file in files:
+        absolute_path = os.path.join(files_dir, file)
+        file_name_ctime_dict[absolute_path] = os.path.getctime(absolute_path)
+    sorted_dict = dict(sorted(file_name_ctime_dict.items(), key=lambda item: item[1]))
+    if sorted_dict:
+        return list(sorted_dict.keys())
