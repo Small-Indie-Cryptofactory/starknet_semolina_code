@@ -23,8 +23,12 @@ async def start_deploy_wallets():
     else:
         text += '> '
     wallets_path = input(text).strip()
-    if 1 <= int(wallets_path) <= len(wallets_files):
+
+    if not wallets_path:
+        await start_deploy_wallets()
+    elif 1 <= int(wallets_path) <= len(wallets_files):
         wallets_path = wallets_files[int(wallets_path) - 1]
+
     if not os.path.exists(wallets_path):
         logger.error(f'File {wallets_path} does not exists')
         return
