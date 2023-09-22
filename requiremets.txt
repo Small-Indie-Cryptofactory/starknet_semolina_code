@@ -1,0 +1,16 @@
+starknet-py
+web3
+loguru
+python-dotenv
+mnemonic
+rlp
+crypto
+pycryptodome
+base58
+tqdm
+sqlalchemy
+aiohttp
+aiohttp_proxy
+requests
+colorama
+fake_useragent
