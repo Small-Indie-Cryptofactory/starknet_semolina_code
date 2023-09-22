@@ -9,7 +9,7 @@ from utils.import_wallets import get_wallets
 from generate_wallets.wallet_generator import wallet_create
 from generate_wallets.utils import find_wallets_files, find_proxy_file
 from deploy.main import deploy_wallet
-from utils.utils import check_node_url, sleep_delay, get_lines
+from utils.utils import check_node_url, sleep_delay, get_lines, get_starknet_actual_gas_price
 from data.models import Wallet, Settings
 
 
@@ -57,10 +57,10 @@ async def start_deploy_wallets():
     for wallet_number, wallet in enumerate(wallets, start=1):
         eth_client = EthClient(network=Networks.Ethereum)
         gas_price = await eth_client.transactions.gas_price(w3=eth_client.w3)
-
-        while gas_price.GWei > settings.maximum_gas_price.GWei:
-            logger.warning(
-                f'Current gas price is too high: {round(gas_price.GWei, 2)} > {settings.maximum_gas_price.GWei}! Sleep 10 minutes...')
+        starknet_gas_price = await get_starknet_actual_gas_price()
+        while gas_price.GWei > settings.maximum_gas_price.GWei or starknet_gas_price.GWei > starknet_gas_price.GWei:
+            logger.warning(f'Current gas price is too high: ETH {gas_price.GWei} or '
+                         f'Starknet {starknet_gas_price.GWei} > {settings.maximum_gas_price.GWei}! Sleep 10 minutes...')
             await asyncio.sleep(600)
             gas_price = await eth_client.transactions.gas_price(w3=eth_client.w3)
 
@@ -110,5 +110,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print()
 
-    except ValueError:
-        print(f"You didn't enter a number!")
+    except ValueError as err:
+        print(err)

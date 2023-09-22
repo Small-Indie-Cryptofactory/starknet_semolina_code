@@ -35,7 +35,8 @@ class Base:
 
         url = f'https://api.viewblock.io/starknet/contracts/{account_address}/txs'
 
-        async with aiohttp.ClientSession(connector=self.starknet_client.connector) as session:
+        connector = self.starknet_client.get_session()
+        async with aiohttp.ClientSession(connector=connector) as session:
             async with await session.get(
                     url,
                     params=params,

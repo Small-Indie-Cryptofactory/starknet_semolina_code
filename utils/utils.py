@@ -5,10 +5,11 @@ from typing import Optional, Union
 from datetime import datetime, timedelta, timezone
 
 import asyncio
+import aiohttp
 from loguru import logger
 from fake_useragent import UserAgent
 from tqdm import tqdm
-from data.models import Settings
+from data.models import Settings, Wei
 
 
 def check_node_url(proxies_lst: list):
@@ -126,3 +127,31 @@ def get_lines(path):
         with open(path, encoding='utf-8') as f:
             proxies_lst = list(map(lambda line: line.strip(), filter(lambda line: line.strip(), f.readlines())))
     return proxies_lst
+
+
+async def get_starknet_actual_gas_price(depth=10):
+    if depth == 0:
+        raise ConnectionError(f'Not possible receive actual gas_price')
+    user_agent = UserAgent().chrome
+
+    url = 'https://alpha-mainnet.starknet.io/feeder_gateway/get_block?blockNumber=latest'
+
+    headers = {
+        'authority': 'alpha-mainnet.starknet.io',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'accept-language': 'ru-RU,ru;q=0.7',
+        'user-agent': user_agent,
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with await session.get(
+                    url=url,
+                    headers=headers,
+                    allow_redirects=True
+            ) as r:
+                result = (await r.json())
+                gas_price = Wei(int(result['gas_price'], 16))
+                return gas_price
+    except:
+        return await get_starknet_actual_gas_price(depth - 1)

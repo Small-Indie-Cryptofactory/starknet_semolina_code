@@ -43,11 +43,9 @@ class StarknetClient:
 
         self.starknet_client = None
         self.account = None
-        self.cairo_version = None
         self.session = None
         self.connector = None
         self.proxy = proxy
-
         self.check_proxy = check_proxy
         self.provider = self.get_wallet_provider()
 
