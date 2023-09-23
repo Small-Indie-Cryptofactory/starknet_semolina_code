@@ -8,7 +8,7 @@
 # <a id="public-software-for-starknet"></a>🌐🛠️ Public Software for Starknet
 <p align="center">Created by <a href="https://t.me/ahillary">Ahillary</a> & <a href="https://t.me/saniksin">Saniksin</a></p>
 <p align="center">📱 <a href="https://t.me/python_with_ahillary">Join our Telegram Group</a></p>
-<p align="center">📺 <a href="https://add.link">Video Tutorial on Software Usage</a></p>
+
 
 
 
@@ -136,7 +136,7 @@ This section provides a detailed comparison between the free and premium version
 # <a id="публичный-софт-для-работы-со-starknet"></a>⚙️ Публичный софт для Starknet 🌟
 <p align="center">Разработан <a href="https://t.me/ahillary">Ahillary</a> & <a href="https://t.me/saniksin">Saniksin</a></p>
 <p align="center">📱 <a href="https://t.me/python_with_ahillary">Присоединяйтесь к нашей Telegram группе</a></p>
-<p align="center">📺 <a href="https://add.link">Видео обзор по использованию софта</a></p>
+
 
 
 ### Cодержимое
