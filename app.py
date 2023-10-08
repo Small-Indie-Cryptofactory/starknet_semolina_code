@@ -36,6 +36,7 @@ async def start_deploy_wallets():
                          f'Starknet {starknet_gas_price.GWei} > {settings.maximum_gas_price.GWei}! Sleep 10 minutes...')
             await asyncio.sleep(600)
             gas_price = await eth_client.transactions.gas_price(w3=eth_client.w3)
+            starknet_gas_price = await get_starknet_actual_gas_price()
 
         logger.info(f'({wallet_number}/{number_of_wallets}) Start deploy wallet')
         result = await deploy_wallet(wallet)
