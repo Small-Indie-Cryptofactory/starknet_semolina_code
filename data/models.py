@@ -13,6 +13,7 @@ from data.config import ABIS_DIR, SETTINGS_PATH
 
 # Token-ABI
 DEFAULT_TOKEN_ABI = json.load(open(os.path.join(ABIS_DIR, 'default_token_abi.json')))
+ARGENT_WALLET = json.load(open(os.path.join(ABIS_DIR, 'argent_wallet.json')))
 
 
 class Wallet:

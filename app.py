@@ -1,52 +1,21 @@
-import os
 import asyncio
 from loguru import logger
 
 from client import EthClient
 from data.models import Networks
 from functions.create_files import create_files
-from utils.import_wallets import get_wallets
+from utils.wallets import get_wallets, get_wallets_path, get_proxies_lst
 from generate_wallets.wallet_generator import wallet_create
-from generate_wallets.utils import find_wallets_files, find_proxy_file
 from deploy.main import deploy_wallet
-from utils.utils import check_node_url, sleep_delay, get_lines, get_starknet_actual_gas_price
+from utils.utils import check_node_url, sleep_delay, get_starknet_actual_gas_price
 from data.models import Wallet, Settings
+from upgrade.main import upgrade_wallets
 
 
 async def start_deploy_wallets():
-    text = f'Enter the path to the file with wallets ( address, private_key, seed_phrase[OPTIONAL] ):\n'
-    wallets_files = find_wallets_files()
-    if wallets_files:
-        for number, wallets_file in enumerate(wallets_files, start=1):
-            text += f'Press "{number}" if you want to use {"/".join(wallets_file.split("/")[-2:])}\n'
-        text += '> '
-    else:
-        text += '> '
-    wallets_path = input(text).strip()
+    wallets_path = get_wallets_path()
+    proxies_lst = get_proxies_lst()
 
-    if not wallets_path:
-        await start_deploy_wallets()
-    elif 1 <= int(wallets_path) <= len(wallets_files):
-        wallets_path = wallets_files[int(wallets_path) - 1]
-
-    if not os.path.exists(wallets_path):
-        logger.error(f'File {wallets_path} does not exists')
-        return
-
-    text = f'Enter the path to the proxy file. If there is no proxy, press Enter:\n'
-    proxies_file = find_proxy_file()
-    if proxies_file:
-        text += f'Press "Enter" if you want to use {proxies_file}:\n> '
-    else:
-        text += '> '
-    proxies_path = input(text).strip()
-    if not proxies_path:
-        proxies_path = proxies_file
-    if not os.path.exists(proxies_path):
-        logger.error(f'File {proxies_path} does not exists')
-        return
-
-    proxies_lst = get_lines(proxies_path)
     wallets: list[Wallet] = get_wallets(path=wallets_path, proxies_lst=proxies_lst)
     check_node_url(proxies_lst=proxies_lst)
     settings = Settings()
@@ -93,13 +62,28 @@ async def start_deploy_wallets():
             logger.warning(wallet_with_errors)
 
 
+async def upgrade_all_wallets():
+    wallets_path = get_wallets_path()
+    proxies_lst = get_proxies_lst()
+
+    wallets: list[Wallet] = get_wallets(path=wallets_path, proxies_lst=proxies_lst)
+    check_node_url(proxies_lst=proxies_lst)
+
+    if not wallets:
+        logger.error(f'Problem with wallets import')
+        return
+
+    await upgrade_wallets(wallets, shuffle=True)
+
+
 if __name__ == '__main__':
     create_files()
     loop = asyncio.new_event_loop()
     print(f'''Select the action:
 1) Generate wallet Ethereum/Argent/Braavos
 2) Deploy Argent & Braavos wallets
-3) Exit''')
+3) Upgrade all wallets
+4) Exit''')
 
     try:
         loop = asyncio.get_event_loop()
@@ -108,6 +92,8 @@ if __name__ == '__main__':
             wallet_create()
         if action == 2:
             loop.run_until_complete(start_deploy_wallets())
+        elif action == 3:
+            loop.run_until_complete(upgrade_all_wallets())
         else:
             exit(1)
 
@@ -115,4 +101,7 @@ if __name__ == '__main__':
         print()
 
     except ValueError as err:
+        print(err)
+
+    except FileNotFoundError as err:
         print(err)
