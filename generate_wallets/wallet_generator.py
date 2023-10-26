@@ -31,7 +31,7 @@ def wallet_create():
         wallet = WalletGenerator.generate_wallet(provider)
         wallets_rows.append([wallet.address, wallet.private_key, wallet.seed_phrase])
 
-    filename = f"{provider}_{len(wallets_rows)}_{str(datetime.now()).replace(' ', '_')}.csv"
+    filename = f"{provider}_{len(wallets_rows)}_{str(datetime.now()).replace(' ', '_').replace(':', '.')}.csv"
 
     with open(os.path.join(FILES_DIR, filename), 'w') as f:
         writer = csv.writer(f)
